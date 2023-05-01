@@ -137,7 +137,6 @@ def get_new_node(node,theta):
         new_node = (custom_coord_round(node[0] + i*np.cos(theta)), 
                     custom_coord_round(node[1] + i*np.sin(theta)))
         if not check_obstacles(new_node[0],new_node[1]):
-            # print('I\'m here.')
             return None
     if new_node not in explored_nodes:
         node_records[str(new_node)] = closest_node
@@ -188,8 +187,8 @@ obstacles_var2 = obstacles_circ(obstacle_buffer)
 init_pos = custom_coord_round(50),custom_coord_round(100)
 goal_pos = custom_coord_round(100),custom_coord_round(105)
 
-print(check_obstacles(init_pos[0],init_pos[1]))
-print(check_obstacles(goal_pos[0],goal_pos[1]))
+print('Initial position in obstacle?:', not check_obstacles(init_pos[0],init_pos[1]))
+print('Final position in obstacle?:', not check_obstacles(goal_pos[0],goal_pos[1]))
 
 goal_radius = int(5)
 
@@ -200,11 +199,10 @@ iterations = 60000
 
 node_records = {}
 explored_nodes = []
-visited_nodes_track = OrderedSet()
 rand_points = []
 backtrack = []
 
-step = 5
+step = 3
 
 if __name__ == '__main__':
     node_records[str(init_pos)] = init_pos
