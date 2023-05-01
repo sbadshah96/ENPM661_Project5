@@ -181,8 +181,16 @@ def backtracking(last_node):
         backtrack.append(key)
     return backtrack[::-1]
 
+obstacle_buffer = 5
+obstacles_var1 = obstacles_rec(obstacle_buffer)
+obstacles_var2 = obstacles_circ(obstacle_buffer)
+
 init_pos = custom_coord_round(50),custom_coord_round(100)
-goal_pos = custom_coord_round(100),custom_coord_round(115)
+goal_pos = custom_coord_round(100),custom_coord_round(105)
+
+print(check_obstacles(init_pos[0],init_pos[1]))
+print(check_obstacles(goal_pos[0],goal_pos[1]))
+
 goal_radius = int(5)
 
 map_x = 600
@@ -195,10 +203,6 @@ explored_nodes = []
 visited_nodes_track = OrderedSet()
 rand_points = []
 backtrack = []
-
-obstacle_buffer = 5
-obstacles_var1 = obstacles_rec(obstacle_buffer)
-obstacles_var2 = obstacles_circ(obstacle_buffer)
 
 step = 5
 
