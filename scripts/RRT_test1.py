@@ -122,10 +122,20 @@ def get_angle(node1,node2):
         return theta
     else:
         return np.deg2rad(90)
-    
+
+# Custom rounding off function for coordinates 
+def custom_coord_round(a):
+    if a - int(a) <= 0.25:
+        return int(a)
+    elif 0.25 < a - int(a) <= 0.75:
+        return int(a) + 0.5
+    elif 0.75 < a - int(a) < 1:
+        return int(a) + 1
+
 def get_new_node(node,theta):
     for i in range(1,step+1):
-        new_node = int(node[0] + i*np.cos(theta)), int(node[1] + i*np.sin(theta))
+        new_node = (custom_coord_round(node[0] + i*np.cos(theta)), 
+                    custom_coord_round(node[1] + i*np.sin(theta)))
         if not check_obstacles(new_node[0],new_node[1]):
             # print('I\'m here.')
             return None
@@ -141,32 +151,50 @@ def get_new_node(node,theta):
         
 def check_goal_reach(x,y):
     if find_distance(x,y,goal_pos[0],goal_pos[1]) < goal_radius:
-        print('Explored Nodes:')
-        print(explored_nodes)
+        # print('Explored Nodes:')
+        # print(explored_nodes)
+        # print('Node Records:')
+        # print(node_records)
         print('Explored Nodes length:',len(explored_nodes))
         print('Goal Reached!')
+        print('Backtracking path:')
+        print(backtracking((x,y)))
+
         return True
 
 def check_last_iteration(iter):
     if iter==iterations-1:
-        print('Explored Nodes:')
-        print(explored_nodes)
+        # print('Explored Nodes:')
+        # print(explored_nodes)
+        # print('Node Records:')
+        # print(node_records)
         print('Explored Nodes length:',len(explored_nodes))
         print('Ran out of fuel.')
 
-init_pos = (50,100)
-goal_pos = (55,105)
-goal_radius = 5
+# Finding the optimal path
+def backtracking(last_node):
+    backtrack.append(last_node)
+    key = node_records[str(last_node)]
+    backtrack.append(key)
+    while key!=init_pos:
+        key = node_records[str(key)]
+        backtrack.append(key)
+    return backtrack[::-1]
+
+init_pos = custom_coord_round(50),custom_coord_round(100)
+goal_pos = custom_coord_round(100),custom_coord_round(115)
+goal_radius = int(5)
 
 map_x = 600
 map_y = 200
 
-iterations = 6000
+iterations = 60000
 
 node_records = {}
 explored_nodes = []
 visited_nodes_track = OrderedSet()
 rand_points = []
+backtrack = []
 
 obstacle_buffer = 5
 obstacles_var1 = obstacles_rec(obstacle_buffer)
