@@ -113,7 +113,7 @@ def find_closest_node(node):
     for i in range(len(explored_nodes)):
         x_current = explored_nodes[i][0]
         y_current = explored_nodes[i][1]
-        distance = find_distance(node[0], x_current, node[1], y_current)
+        distance = find_distance(node[0],node[1],x_current,y_current)
         if distance < min_distance:
             min_distance = distance
             closest_point = (x_current, y_current)
@@ -216,8 +216,8 @@ def arrow(screen, lcolor, tricolor, start, end, trirad):
                                            (end[0]+trirad*math.sin(math.radians(rotation+120)), end[1]+trirad*math.cos(math.radians(rotation+120)))))
 
 
-init_pos = custom_coord_round(50), custom_coord_round(100)
-goal_pos = custom_coord_round(100), custom_coord_round(115)
+init_pos = (custom_coord_round(50), custom_coord_round(150))
+goal_pos = (custom_coord_round(100), custom_coord_round(115))
 goal_radius = int(5)
 
 map_x = 600
@@ -235,7 +235,7 @@ obstacle_buffer = 5
 obstacles_var1 = obstacles_rec(obstacle_buffer)
 obstacles_var2 = obstacles_circ(obstacle_buffer)
 
-step = 5
+step = 7
 
 if __name__ == '__main__':
     node_records[str(init_pos)] = init_pos
@@ -313,7 +313,7 @@ if __name__ == '__main__':
             clock.tick(20)
 
         pygame.display.flip()
-        pygame.time.wait(1000)
+        pygame.time.wait(10000)
         Done = True
 
     pygame.quit()

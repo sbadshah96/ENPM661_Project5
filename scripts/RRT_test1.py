@@ -110,7 +110,7 @@ def find_closest_node(node):
     for i in range(len(explored_nodes)):
         x_current = explored_nodes[i][0]
         y_current = explored_nodes[i][1]
-        distance = find_distance(node[0],x_current,node[1],y_current)
+        distance = find_distance(node[0],node[1],x_current,y_current)
         if distance < min_distance:
             min_distance = distance
             closest_point = (x_current,y_current)

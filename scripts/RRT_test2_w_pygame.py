@@ -113,7 +113,7 @@ def find_closest_node(node):
     for i in range(len(explored_nodes)):
         x_current = explored_nodes[i][0]
         y_current = explored_nodes[i][1]
-        distance = find_distance(node[0], x_current, node[1], y_current)
+        distance = find_distance(node[0],node[1],x_current,y_current)
         if distance < min_distance:
             min_distance = distance
             closest_point = (x_current, y_current)
@@ -243,7 +243,7 @@ if __name__ == '__main__':
 
     """ Pygame Visualization """
     pygame.init()
-    video = vidmaker.Video("a_star_shreejay_aaqib.mp4", late_export=True)
+    # video = vidmaker.Video("a_star_shreejay_aaqib.mp4", late_export=True)
     size = [600, 200]
     d = obstacle_buffer + 10.5
     monitor = pygame.display.set_mode(size)
@@ -281,18 +281,19 @@ if __name__ == '__main__':
         pygame.draw.circle(monitor, "orange", to_pygame((400, 110), 200), radius=50)
 
         # Simulation of visited nodes and Backtracking
-        for l in range(len(visited_nodes_track) - 2):
-            m = visited_nodes_track[l]
-            n = node_records[m][0]
+        for l in range(len(explored_nodes) - 2):
+            m = explored_nodes[l]
+            n = node_records[str(m)]
             m = to_pygame(m, 250)
             n = to_pygame(n, 250)
-            video.update(pygame.surfarray.pixels3d(monitor).swapaxes(0, 1), inverted=False)
-            pygame.draw.lines(monitor, "white", False, node_records[visited_nodes_track[l]][1], width=1)
+            print(n)
+            # video.update(pygame.surfarray.pixels3d(monitor).swapaxes(0, 1), inverted=False)
+            pygame.draw.lines(monitor, "white", False,n, width=1)
             pygame.display.flip()
             clock.tick(500)
         for i in backtrack:
             pygame.draw.circle(monitor, (0, 255, 0), to_pygame(i, 200), 2)
-            video.update(pygame.surfarray.pixels3d(monitor).swapaxes(0, 1), inverted=False)
+            # video.update(pygame.surfarray.pixels3d(monitor).swapaxes(0, 1), inverted=False)
             pygame.display.flip()
             clock.tick(20)
 
@@ -301,4 +302,4 @@ if __name__ == '__main__':
         Done = True
 
     pygame.quit()
-    video.export(verbose=True)
+    # video.export(verbose=True)
