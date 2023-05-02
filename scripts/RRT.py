@@ -226,10 +226,12 @@ def find_intersection(m1, m2, c1, c2, a, b):
 def arrow(screen, lcolor, tricolor, start, end, trirad):
     pygame.draw.line(screen, lcolor, start, end, 1)
     rotation = math.degrees(math.atan2(start[1]-end[1], end[0]-start[0]))+90
-    pygame.draw.polygon(screen, tricolor, ((end[0]+trirad*math.sin(math.radians(rotation)), end[1]+trirad*math.cos(math.radians(rotation))),
+    pygame.draw.polygon(screen, tricolor, ((end[0]+trirad*math.sin(math.radians(rotation)), 
+                                            end[1]+trirad*math.cos(math.radians(rotation))),
                                            (end[0]+trirad*math.sin(math.radians(rotation-120)),
                                             end[1]+trirad*math.cos(math.radians(rotation-120))),
-                                           (end[0]+trirad*math.sin(math.radians(rotation+120)), end[1]+trirad*math.cos(math.radians(rotation+120)))))
+                                           (end[0]+trirad*math.sin(math.radians(rotation+120)), 
+                                            end[1]+trirad*math.cos(math.radians(rotation+120)))))
 
 robot_size = 10.5
 
@@ -265,7 +267,6 @@ if __name__ == '__main__':
         new_point = random_point()
         closest_node = find_closest_node(new_point)
         angle = get_angle(closest_node,new_point)
-        print('angle: ',angle)
         new_node = get_new_node(closest_node, angle)
         if new_node != None:
             val = check_goal_reach(new_node[0], new_node[1])
