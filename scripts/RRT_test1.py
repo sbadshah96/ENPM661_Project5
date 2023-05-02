@@ -116,12 +116,28 @@ def find_closest_node(node):
             closest_point = (x_current,y_current)
     return closest_point
 
-def get_angle(node1,node2):
+def get_angle(node1, node2):
+    # print('node1: ',node1)
+    # print('node2: ',node2)
     if node1[0] != node2[0]:
-        theta = np.arctan((node1[1]-node2[1])/(node1[0]-node2[0]))
-        return theta
-    else:
-        return np.deg2rad(90)
+        theta = np.rad2deg(np.arctan(abs(node1[1] - node2[1]) / abs(node1[0] - node2[0])))
+        if node1[0] < node2[0] and node1[1] <= node2[1]:
+            # print('theta:',theta)
+            return np.round(np.deg2rad(theta),2)
+        elif node1[0] > node2[0] and node1[1] <= node2[1]:
+            # print('theta:',theta+90)
+            return np.round(np.deg2rad(theta+90),2)
+        elif node1[0] > node2[0] and node1[1] >= node2[1]:
+            # print('theta:',theta+180)
+            return np.round(np.deg2rad(theta+180),2)
+        elif node1[0] < node2[0] and node1[1] >= node2[1]:
+            # print('theta:',theta+270)
+            return np.round(np.deg2rad(theta+270),2)
+    else: 
+        if node1[1] > node2[1]:
+            return np.round(np.deg2rad(270),2)
+        elif node1[1] < node2[1]:
+            return np.round(np.deg2rad(90),2)
 
 # Custom rounding off function for coordinates 
 def custom_coord_round(a):

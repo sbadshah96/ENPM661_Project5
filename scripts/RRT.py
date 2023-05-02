@@ -9,7 +9,7 @@ import random
 
 
 # Define new obstacles based on user input buffer
-def obstacles_rec(obstacle_buffer, robot_size=10.5):
+def obstacles_rec(obstacle_buffer, robot_size):
     obstacles = []
 
     buffer_val = obstacle_buffer + robot_size
@@ -56,7 +56,7 @@ def obstacles_rec(obstacle_buffer, robot_size=10.5):
     return obstacles
 
 
-def obstacles_circ(obstacle_buffer, robot_size=10.5):
+def obstacles_circ(obstacle_buffer, robot_size):
     a = 400
     b = 110
     c = 50 + obstacle_buffer + robot_size
@@ -68,7 +68,7 @@ def random_point():
     # random_x = np.random.choice(len(map_x),4,replace=False)
     rand_x = random.randint(0, map_x)
     rand_y = random.randint(0, map_y)
-
+    # print(rand_x,rand_y)
     return (rand_x, rand_y)
 
 
@@ -104,7 +104,7 @@ def check_obstacles(x, y):
 
 
 def find_distance(x1, y1, x2, y2):
-    return np.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
+    return np.sqrt((x1 - x2)**2 + (y1 - y2)**2)
 
 
 def find_closest_node(node):
@@ -121,11 +121,27 @@ def find_closest_node(node):
 
 
 def get_angle(node1, node2):
+    # print('node1: ',node1)
+    # print('node2: ',node2)
     if node1[0] != node2[0]:
-        theta = np.arctan((node1[1] - node2[1]) / (node1[0] - node2[0]))
-        return theta
-    else:
-        return np.deg2rad(90)
+        theta = np.rad2deg(np.arctan(abs(node1[1] - node2[1]) / abs(node1[0] - node2[0])))
+        if node1[0] < node2[0] and node1[1] <= node2[1]:
+            # print('theta:',theta)
+            return np.round(np.deg2rad(theta),2)
+        elif node1[0] > node2[0] and node1[1] <= node2[1]:
+            # print('theta:',theta+90)
+            return np.round(np.deg2rad(theta+90),2)
+        elif node1[0] > node2[0] and node1[1] >= node2[1]:
+            # print('theta:',theta+180)
+            return np.round(np.deg2rad(theta+180),2)
+        elif node1[0] < node2[0] and node1[1] >= node2[1]:
+            # print('theta:',theta+270)
+            return np.round(np.deg2rad(theta+270),2)
+    else: 
+        if node1[1] > node2[1]:
+            return np.round(np.deg2rad(270),2)
+        elif node1[1] < node2[1]:
+            return np.round(np.deg2rad(90),2)
 
 
 # Custom rounding off function for coordinates
@@ -215,15 +231,16 @@ def arrow(screen, lcolor, tricolor, start, end, trirad):
                                             end[1]+trirad*math.cos(math.radians(rotation-120))),
                                            (end[0]+trirad*math.sin(math.radians(rotation+120)), end[1]+trirad*math.cos(math.radians(rotation+120)))))
 
+robot_size = 10.5
 
-init_pos = (custom_coord_round(50), custom_coord_round(150))
-goal_pos = (custom_coord_round(100), custom_coord_round(115))
+init_pos = (custom_coord_round(320), custom_coord_round(100))
+goal_pos = (custom_coord_round(100), custom_coord_round(180))
 goal_radius = int(5)
 
 map_x = 600
 map_y = 200
 
-iterations = 60000
+iterations = 600
 
 node_records = {}
 explored_nodes = []
@@ -232,8 +249,11 @@ rand_points = []
 backtrack = []
 
 obstacle_buffer = 5
-obstacles_var1 = obstacles_rec(obstacle_buffer)
-obstacles_var2 = obstacles_circ(obstacle_buffer)
+obstacles_var1 = obstacles_rec(obstacle_buffer,robot_size)
+obstacles_var2 = obstacles_circ(obstacle_buffer,robot_size)
+
+print('Initial position in obstacle?:', not check_obstacles(init_pos[0],init_pos[1]))
+print('Final position in obstacle?:', not check_obstacles(goal_pos[0],goal_pos[1]))
 
 step = 7
 
@@ -244,7 +264,8 @@ if __name__ == '__main__':
     for i in range(iterations):
         new_point = random_point()
         closest_node = find_closest_node(new_point)
-        angle = get_angle(new_point, closest_node)
+        angle = get_angle(closest_node,new_point)
+        print('angle: ',angle)
         new_node = get_new_node(closest_node, angle)
         if new_node != None:
             val = check_goal_reach(new_node[0], new_node[1])
@@ -257,7 +278,7 @@ if __name__ == '__main__':
     pygame.init()
     # video = vidmaker.Video("a_star_shreejay_aaqib.mp4", late_export=True)
     size = [600, 200]
-    d = obstacle_buffer + 10.5
+    d = obstacle_buffer + robot_size
     monitor = pygame.display.set_mode(size)
     pygame.display.set_caption("Arena")
 
@@ -313,7 +334,7 @@ if __name__ == '__main__':
             clock.tick(20)
 
         pygame.display.flip()
-        pygame.time.wait(10000)
+        pygame.time.wait(3000)
         Done = True
 
     pygame.quit()
