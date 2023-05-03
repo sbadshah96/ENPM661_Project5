@@ -138,7 +138,7 @@ def get_angle(node1, node2):
             # print('theta:',theta+270)
             return np.round(np.deg2rad(theta+270),2)
     else: 
-        if node1[1] > node2[1]:
+        if node1[1] >= node2[1]:
             return np.round(np.deg2rad(270),2)
         elif node1[1] < node2[1]:
             return np.round(np.deg2rad(90),2)
@@ -233,48 +233,7 @@ def arrow(screen, lcolor, tricolor, start, end, trirad):
                                            (end[0]+trirad*math.sin(math.radians(rotation+120)), 
                                             end[1]+trirad*math.cos(math.radians(rotation+120)))))
 
-robot_size = 10.5
-
-init_pos = (custom_coord_round(320), custom_coord_round(100))
-goal_pos = (custom_coord_round(100), custom_coord_round(180))
-goal_radius = int(5)
-
-map_x = 600
-map_y = 200
-
-iterations = 600
-
-node_records = {}
-explored_nodes = []
-visited_nodes_track = OrderedSet()
-rand_points = []
-backtrack = []
-
-obstacle_buffer = 5
-obstacles_var1 = obstacles_rec(obstacle_buffer,robot_size)
-obstacles_var2 = obstacles_circ(obstacle_buffer,robot_size)
-
-print('Initial position in obstacle?:', not check_obstacles(init_pos[0],init_pos[1]))
-print('Final position in obstacle?:', not check_obstacles(goal_pos[0],goal_pos[1]))
-
-step = 7
-
-if __name__ == '__main__':
-    node_records[str(init_pos)] = init_pos
-    explored_nodes.append(init_pos)
-    visited_nodes_track.add(init_pos)
-    for i in range(iterations):
-        new_point = random_point()
-        closest_node = find_closest_node(new_point)
-        angle = get_angle(closest_node,new_point)
-        new_node = get_new_node(closest_node, angle)
-        if new_node != None:
-            val = check_goal_reach(new_node[0], new_node[1])
-            if val:
-                break
-        check_last_iteration(i)
-    print('The end')
-
+def viz():
     """ Pygame Visualization """
     pygame.init()
     # video = vidmaker.Video("a_star_shreejay_aaqib.mp4", late_export=True)
@@ -322,8 +281,8 @@ if __name__ == '__main__':
             # print(my_string)
             # print("HELLO")
             n = (node_records[str(m)])
-            m = to_pygame(m, 250)
-            n = to_pygame(n, 250)
+            m = to_pygame(m, 200)
+            n = to_pygame(n, 200)
             # video.update(pygame.surfarray.pixels3d(monitor).swapaxes(0, 1), inverted=False)
             arrow(monitor, "white", (0, 0, 0), [m[0], m[1]], [n[0], n[1]], 0.5)
             pygame.display.flip()
@@ -340,3 +299,46 @@ if __name__ == '__main__':
 
     pygame.quit()
     # video.export(verbose=True)
+
+robot_size = 10.5
+
+map_x = 600
+map_y = 200
+
+init_pos = (custom_coord_round(500), custom_coord_round(100))
+goal_pos = (custom_coord_round(100), custom_coord_round(180))
+goal_radius = int(5)
+
+iterations = 6000
+
+node_records = {}
+explored_nodes = []
+visited_nodes_track = OrderedSet()
+rand_points = []
+backtrack = []
+
+obstacle_buffer = 5
+obstacles_var1 = obstacles_rec(obstacle_buffer,robot_size)
+obstacles_var2 = obstacles_circ(obstacle_buffer,robot_size)
+
+print('Initial position in obstacle?:', not check_obstacles(init_pos[0],init_pos[1]))
+print('Final position in obstacle?:', not check_obstacles(goal_pos[0],goal_pos[1]))
+
+step = 7
+
+if __name__ == '__main__':
+    node_records[str(init_pos)] = init_pos
+    explored_nodes.append(init_pos)
+    visited_nodes_track.add(init_pos)
+    for i in range(iterations):
+        new_point = random_point()
+        closest_node = find_closest_node(new_point)
+        angle = get_angle(closest_node,new_point)
+        new_node = get_new_node(closest_node, angle)
+        if new_node != None:
+            val = check_goal_reach(new_node[0], new_node[1])
+            if val:
+                viz()
+                break
+        check_last_iteration(i)
+    print('The end')
