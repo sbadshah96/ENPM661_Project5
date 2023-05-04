@@ -65,10 +65,8 @@ def obstacles_circ(obstacle_buffer, robot_size):
 
 
 def random_point():
-    # random_x = np.random.choice(len(map_x),4,replace=False)
     rand_x = random.randint(0, map_x)
     rand_y = random.randint(0, map_y)
-    # print(rand_x,rand_y)
     return (rand_x, rand_y)
 
 
@@ -153,7 +151,6 @@ def custom_coord_round(a):
     elif 0.75 < a - int(a) < 1:
         return int(a) + 1
 
-
 def get_new_node(node, theta, new_point):
     for i in range(1, step + 1):
         new_node = (custom_coord_round(node[0] + i * np.cos(theta)),
@@ -175,10 +172,6 @@ def get_new_node(node, theta, new_point):
 
 def check_goal_reach(x, y):
     if find_distance(x, y, goal_pos[0], goal_pos[1]) < goal_radius:
-        # print('Explored Nodes:')
-        # print(explored_nodes)
-        # print('Node Records:')
-        # print(node_records)
         print('Explored Nodes length:', len(explored_nodes))
         print('Goal Reached!')
         print('Backtracking path:')
@@ -189,10 +182,6 @@ def check_goal_reach(x, y):
 
 def check_last_iteration(iter):
     if iter == iterations - 1:
-        # print('Explored Nodes:')
-        # print(explored_nodes)
-        # print('Node Records:')
-        # print(node_records)
         print('Explored Nodes length:', len(explored_nodes))
         print('Ran out of fuel.')
 
