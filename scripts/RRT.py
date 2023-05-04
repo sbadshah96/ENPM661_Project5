@@ -154,7 +154,7 @@ def custom_coord_round(a):
         return int(a) + 1
 
 
-def get_new_node(node, theta):
+def get_new_node(node, theta, new_point):
     for i in range(1, step + 1):
         new_node = (custom_coord_round(node[0] + i * np.cos(theta)),
                     custom_coord_round(node[1] + i * np.sin(theta)))
@@ -162,7 +162,7 @@ def get_new_node(node, theta):
             # print('I\'m here.')
             return None
     if new_node not in explored_nodes:
-        node_records[str(new_node)] = closest_node
+        node_records[str(new_node)] = node
         explored_nodes.append(new_node)
         visited_nodes_track.add(new_node)
         rand_points.append(new_point)
@@ -240,7 +240,7 @@ def viz():
     size = [600, 200]
     d = obstacle_buffer + robot_size
     monitor = pygame.display.set_mode(size)
-    pygame.display.set_caption("Arena")
+    pygame.display.set_caption("RRT Arena")
 
     Done = False
     clock = pygame.time.Clock()
@@ -324,9 +324,10 @@ obstacles_var2 = obstacles_circ(obstacle_buffer,robot_size)
 print('Initial position in obstacle?:', not check_obstacles(init_pos[0],init_pos[1]))
 print('Final position in obstacle?:', not check_obstacles(goal_pos[0],goal_pos[1]))
 
-step = 7
+step = 5
 
 if __name__ == '__main__':
+    start = time.time()
     node_records[str(init_pos)] = init_pos
     explored_nodes.append(init_pos)
     visited_nodes_track.add(init_pos)
@@ -334,10 +335,12 @@ if __name__ == '__main__':
         new_point = random_point()
         closest_node = find_closest_node(new_point)
         angle = get_angle(closest_node,new_point)
-        new_node = get_new_node(closest_node, angle)
+        new_node = get_new_node(closest_node, angle, new_point)
         if new_node != None:
             val = check_goal_reach(new_node[0], new_node[1])
             if val:
+                end = time.time()
+                print('Time: ', round((end - start), 2), 's')
                 viz()
                 break
         check_last_iteration(i)

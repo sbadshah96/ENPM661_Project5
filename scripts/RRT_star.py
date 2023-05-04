@@ -7,7 +7,6 @@ from sortedcollections import OrderedSet
 import pygame
 import random
 
-
 # Define new obstacles based on user input buffer
 def obstacles_rec(obstacle_buffer, robot_size):
     obstacles = []
@@ -52,7 +51,6 @@ def obstacles_rec(obstacle_buffer, robot_size):
     obstacles.append((0, c2_bound))
     obstacles.append((0, c3_bound))
     obstacles.append((0, c4_bound))
-
     return obstacles
 
 
@@ -60,17 +58,18 @@ def obstacles_circ(obstacle_buffer, robot_size):
     a = 400
     b = 110
     c = 50 + obstacle_buffer + robot_size
-
     return a, b, c
-
 
 def random_point():
     # random_x = np.random.choice(len(map_x),4,replace=False)
     rand_x = random.randint(0, map_x)
     rand_y = random.randint(0, map_y)
     # print(rand_x,rand_y)
-    return (rand_x, rand_y)
-
+    check_obstacles(rand_x,rand_y)
+    if check_obstacles:
+        return (rand_x, rand_y)
+    else:
+        return None
 
 # Check if the robot is in obstacle space.
 def check_obstacles(x, y):
@@ -102,24 +101,6 @@ def check_obstacles(x, y):
     else:
         return True
 
-
-def find_distance(x1, y1, x2, y2):
-    return np.sqrt((x1 - x2)**2 + (y1 - y2)**2)
-
-
-def find_closest_node(node):
-    min_distance = np.inf
-    closest_point = (0, 0)
-    for i in range(len(explored_nodes)):
-        x_current = explored_nodes[i][0]
-        y_current = explored_nodes[i][1]
-        distance = find_distance(node[0],node[1],x_current,y_current)
-        if distance < min_distance:
-            min_distance = distance
-            closest_point = (x_current, y_current)
-    return closest_point
-
-
 def get_angle(node1, node2):
     # print('node1: ',node1)
     # print('node2: ',node2)
@@ -143,76 +124,109 @@ def get_angle(node1, node2):
         elif node1[1] < node2[1]:
             return np.round(np.deg2rad(90),2)
 
+def check_line_obstacles(node1,node2):
+    # A1 = np.array([[node1[0],1],[node2[0],1]])
+    # B1 = np.array([node1[1],node2[2]])
+    # m1,c1 = np.linalg.solve(A1,B1)
+    # N = abs(node1[0]-node1[1])
+    theta = get_angle(node1,node2)
+    for i in range(1,int(find_distance(node1[0],node1[1],node2[0],node2[1])),2):
+        interim_node = ((node1[0] + i * np.cos(theta)),(node1[1] + i * np.sin(theta)))
+        if not check_obstacles(interim_node[0], interim_node[1]):
+            return False
+    return True
 
-# Custom rounding off function for coordinates
-def custom_coord_round(a):
-    if a - int(a) <= 0.25:
-        return int(a)
-    elif 0.25 < a - int(a) <= 0.75:
-        return int(a) + 0.5
-    elif 0.75 < a - int(a) < 1:
-        return int(a) + 1
+def find_distance(x1, y1, x2, y2):
+    return round(np.sqrt((x1 - x2)**2 + (y1 - y2)**2),2)
 
+def find_range(node):
+    rangeX = np.arange(int(node[0]) - check_radius_RRTS, 
+                       int(node[0]) + check_radius_RRTS + 1, 1)
+    rangeY = np.arange(int(node[1]) - check_radius_RRTS, 
+                       int(node[1]) + check_radius_RRTS + 1, 1)
+    return rangeX,rangeY
 
-def get_new_node(node, theta):
-    for i in range(1, step + 1):
-        new_node = (custom_coord_round(node[0] + i * np.cos(theta)),
-                    custom_coord_round(node[1] + i * np.sin(theta)))
-        if not check_obstacles(new_node[0], new_node[1]):
-            # print('I\'m here.')
-            return None
-    if new_node not in explored_nodes:
-        node_records[str(new_node)] = closest_node,step
-        explored_nodes.append(new_node)
-        visited_nodes_track.add(new_node)
-        rand_points.append(new_point)
-        return new_node
-        # else:
-        #     return None
+def find_neighbors(node):
+    neighbors = []
+    range_x, range_y = find_range(node)
+    for i in range_x:
+        i = int(i)
+        for j in range_y:
+            j = int(j)
+            coord = (i,j)
+            if coord in explored_nodes:
+                neighbors.append(coord)
+    return neighbors
+
+def find_parent(node):
+    min_cost = np.inf
+    parent_node = None
+    neighbor_nodes = find_neighbors(node)
+    for neighbor in neighbor_nodes:
+        if neighbor != node:
+            val = check_line_obstacles(node,neighbor)
+            if val == True :
+                cost = find_distance(node[0],node[1],neighbor[0],neighbor[1])
+                total_cost = cost + node_records[str(neighbor)][1]
+                if total_cost < min_cost:
+                    min_cost = total_cost
+                    parent_node = neighbor
+    if parent_node == None:
+        return None,None
     else:
-        return None
+        return parent_node,min_cost
 
+def update_neighbors(node):
+    neighbor_nodes = find_neighbors(node)
+    for neighbor in neighbor_nodes:
+        if neighbor != node:
+            val = check_line_obstacles(node,neighbor)
+            if val == True:
+                cost = find_distance(node[0],node[1],neighbor[0],neighbor[1])
+                total_cost = cost + node_records[str(node)][1]
+                existing_cost = node_records[str(neighbor)][1]
+                if total_cost < existing_cost:
+                    node_records[str(neighbor)] = new_node,total_cost
 
-def check_goal_reach(x, y):
+def check_goal_reach(x,y,i):
     if find_distance(x, y, goal_pos[0], goal_pos[1]) < goal_radius:
-        # print('Explored Nodes:')
-        # print(explored_nodes)
-        # print('Node Records:')
-        # print(node_records)
         print('Explored Nodes length:', len(explored_nodes))
+        print('Node Records Length: ',len(node_records))
         print('Goal Reached!')
         print('Backtracking path:')
         print(backtracking((x, y)))
-
+        end = time.time()
+        print('Time: ', round((end - start), 2), 's')
+        print('Iterations',i)
         return True
-
 
 def check_last_iteration(iter):
     if iter == iterations - 1:
-        # print('Explored Nodes:')
-        # print(explored_nodes)
-        # print('Node Records:')
-        # print(node_records)
         print('Explored Nodes length:', len(explored_nodes))
+        print('Node Records Length: ',len(node_records))
         print('Ran out of fuel.')
-
+        end = time.time()
+        print('Time: ', round((end - start), 2), 's')
+        viz()
 
 # Finding the optimal path
 def backtracking(last_node):
     backtrack.append(last_node)
     key = node_records[str(last_node)][0]
     backtrack.append(key)
+    ii = 0
     while key != init_pos:
         key = node_records[str(key)][0]
+        # print('key',key)
         backtrack.append(key)
+        ii += 1
     return backtrack[::-1]
 
-
-""" Convert coordinates into pygame coordinates """
+# Convert coordinates into pygame coordinates
 def to_pygame(coords, height):
     return coords[0], height - coords[1]
 
-""" Convert an object's coordinates into pygame coordinates """
+# Convert an object's coordinates into pygame coordinates
 def rec_pygame(coords, height, obj_height):
     return coords[0], height - coords[1] - obj_height
 
@@ -233,14 +247,14 @@ def arrow(screen, lcolor, tricolor, start, end, trirad):
                                            (end[0]+trirad*math.sin(math.radians(rotation+120)), 
                                             end[1]+trirad*math.cos(math.radians(rotation+120)))))
 
+# Pygame Visualization
 def viz():
-    """ Pygame Visualization """
     pygame.init()
     # video = vidmaker.Video("a_star_shreejay_aaqib.mp4", late_export=True)
     size = [600, 200]
     d = obstacle_buffer + robot_size
     monitor = pygame.display.set_mode(size)
-    pygame.display.set_caption("Arena")
+    pygame.display.set_caption("RRT* Arena")
 
     Done = False
     clock = pygame.time.Clock()
@@ -274,7 +288,6 @@ def viz():
         pygame.draw.circle(monitor, "orange", to_pygame((400, 110), 200), radius=50)
 
         # Simulation of visited nodes and Backtracking
-        print(len(node_records))
         for l in range(len(visited_nodes_track) - 2):
             m = visited_nodes_track[l]
             # my_string = "'" + str(m) + "'"
@@ -294,7 +307,7 @@ def viz():
             clock.tick(20)
 
         pygame.display.flip()
-        pygame.time.wait(3000)
+        pygame.time.wait(2000)
         Done = True
 
     pygame.quit()
@@ -305,11 +318,11 @@ robot_size = 10.5
 map_x = 600
 map_y = 200
 
-init_pos = (custom_coord_round(500), custom_coord_round(100))
-goal_pos = (custom_coord_round(100), custom_coord_round(180))
-goal_radius = int(5)
+init_pos = (int(500), int(100))
+goal_pos = (int(400), int(40))
+goal_radius = 5
 
-iterations = 6000
+iterations = 30000
 
 node_records = {}
 explored_nodes = []
@@ -324,23 +337,25 @@ obstacles_var2 = obstacles_circ(obstacle_buffer,robot_size)
 print('Initial position in obstacle?:', not check_obstacles(init_pos[0],init_pos[1]))
 print('Final position in obstacle?:', not check_obstacles(goal_pos[0],goal_pos[1]))
 
-step = 7
+check_radius_RRTS = 15
 
 if __name__ == '__main__':
-    node_records[str(init_pos)] = init_pos,step
+    start = time.time()
+    node_records[str(init_pos)] = init_pos,0
     explored_nodes.append(init_pos)
     visited_nodes_track.add(init_pos)
     for i in range(iterations):
-        new_point = random_point()
-        closest_node = find_closest_node(new_point)
-        angle = get_angle(closest_node,new_point)
-        new_node = get_new_node(closest_node, angle)
+        new_node = random_point()
         if new_node != None:
-            val = check_goal_reach(new_node[0], new_node[1])
-            if val:
-                viz()
-                break
+            parent_node,cost = find_parent(new_node)
+            if parent_node != None:
+                node_records[str(new_node)] = parent_node,cost
+                explored_nodes.append(new_node)
+                visited_nodes_track.add(new_node)
+                update_neighbors(new_node)
+                val = check_goal_reach(new_node[0], new_node[1],i)
+                if val:
+                    viz()
+                    break
         check_last_iteration(i)
     print('The end')
-
-    
