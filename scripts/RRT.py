@@ -225,7 +225,7 @@ def arrow(screen, lcolor, tricolor, start, end, trirad):
 def viz():
     """ Pygame Visualization """
     pygame.init()
-    # video = vidmaker.Video("a_star_shreejay_aaqib.mp4", late_export=True)
+    video = vidmaker.Video("rrt_shreejay_aaqib.mp4", late_export=True)
     size = [600, 200]
     d = obstacle_buffer + robot_size
     monitor = pygame.display.set_mode(size)
@@ -272,13 +272,13 @@ def viz():
             n = (node_records[str(m)])
             m = to_pygame(m, 200)
             n = to_pygame(n, 200)
-            # video.update(pygame.surfarray.pixels3d(monitor).swapaxes(0, 1), inverted=False)
+            video.update(pygame.surfarray.pixels3d(monitor).swapaxes(0, 1), inverted=False)
             arrow(monitor, "white", (0, 0, 0), [m[0], m[1]], [n[0], n[1]], 0.5)
             pygame.display.flip()
             clock.tick(10000)
         for i in backtrack:
             pygame.draw.circle(monitor, (0, 255, 0), to_pygame(i, 200), 2)
-            # video.update(pygame.surfarray.pixels3d(monitor).swapaxes(0, 1), inverted=False)
+            video.update(pygame.surfarray.pixels3d(monitor).swapaxes(0, 1), inverted=False)
             pygame.display.flip()
             clock.tick(20)
 

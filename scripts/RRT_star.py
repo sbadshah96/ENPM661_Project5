@@ -102,21 +102,15 @@ def check_obstacles(x, y):
         return True
 
 def get_angle(node1, node2):
-    # print('node1: ',node1)
-    # print('node2: ',node2)
     if node1[0] != node2[0]:
         theta = np.rad2deg(np.arctan(abs(node1[1] - node2[1]) / abs(node1[0] - node2[0])))
         if node1[0] < node2[0] and node1[1] <= node2[1]:
-            # print('theta:',theta)
             return np.round(np.deg2rad(theta),2)
         elif node1[0] > node2[0] and node1[1] <= node2[1]:
-            # print('theta:',theta+90)
             return np.round(np.deg2rad(theta+90),2)
         elif node1[0] > node2[0] and node1[1] >= node2[1]:
-            # print('theta:',theta+180)
             return np.round(np.deg2rad(theta+180),2)
         elif node1[0] < node2[0] and node1[1] >= node2[1]:
-            # print('theta:',theta+270)
             return np.round(np.deg2rad(theta+270),2)
     else: 
         if node1[1] >= node2[1]:
@@ -125,10 +119,6 @@ def get_angle(node1, node2):
             return np.round(np.deg2rad(90),2)
 
 def check_line_obstacles(node1,node2):
-    # A1 = np.array([[node1[0],1],[node2[0],1]])
-    # B1 = np.array([node1[1],node2[2]])
-    # m1,c1 = np.linalg.solve(A1,B1)
-    # N = abs(node1[0]-node1[1])
     theta = get_angle(node1,node2)
     for i in range(1,int(find_distance(node1[0],node1[1],node2[0],node2[1])),2):
         interim_node = ((node1[0] + i * np.cos(theta)),(node1[1] + i * np.sin(theta)))
@@ -250,7 +240,7 @@ def arrow(screen, lcolor, tricolor, start, end, trirad):
 # Pygame Visualization
 def viz():
     pygame.init()
-    # video = vidmaker.Video("a_star_shreejay_aaqib.mp4", late_export=True)
+    video = vidmaker.Video("rrt_star_shreejay_aaqib.mp4", late_export=True)
     size = [600, 200]
     d = obstacle_buffer + robot_size
     monitor = pygame.display.set_mode(size)
@@ -296,13 +286,13 @@ def viz():
             n = (node_records[str(m)][0])
             m = to_pygame(m, 200)
             n = to_pygame(n, 200)
-            # video.update(pygame.surfarray.pixels3d(monitor).swapaxes(0, 1), inverted=False)
+            video.update(pygame.surfarray.pixels3d(monitor).swapaxes(0, 1), inverted=False)
             arrow(monitor, "white", (0, 0, 0), [m[0], m[1]], [n[0], n[1]], 0.5)
             pygame.display.flip()
             clock.tick(10000)
         for i in backtrack:
             pygame.draw.circle(monitor, (0, 255, 0), to_pygame(i, 200), 2)
-            # video.update(pygame.surfarray.pixels3d(monitor).swapaxes(0, 1), inverted=False)
+            video.update(pygame.surfarray.pixels3d(monitor).swapaxes(0, 1), inverted=False)
             pygame.display.flip()
             clock.tick(20)
 
@@ -311,7 +301,7 @@ def viz():
         Done = True
 
     pygame.quit()
-    # video.export(verbose=True)
+    video.export(verbose=True)
 
 robot_size = 10.5
 
@@ -319,7 +309,7 @@ map_x = 600
 map_y = 200
 
 init_pos = (int(500), int(100))
-goal_pos = (int(400), int(40))
+goal_pos = (int(100), int(40))
 goal_radius = 5
 
 iterations = 30000
@@ -334,8 +324,12 @@ obstacle_buffer = 5
 obstacles_var1 = obstacles_rec(obstacle_buffer,robot_size)
 obstacles_var2 = obstacles_circ(obstacle_buffer,robot_size)
 
-print('Initial position in obstacle?:', not check_obstacles(init_pos[0],init_pos[1]))
-print('Final position in obstacle?:', not check_obstacles(goal_pos[0],goal_pos[1]))
+print('RRT Starring....')
+
+if not check_obstacles(init_pos[0],init_pos[1]):
+    print('Start node in the obstacle space.')
+if not check_obstacles(goal_pos[0],goal_pos[1]):
+    print('Goal node in the obstacle space.')
 
 check_radius_RRTS = 15
 
