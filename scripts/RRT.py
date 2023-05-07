@@ -225,7 +225,7 @@ def arrow(screen, lcolor, tricolor, start, end, trirad):
 def viz():
     """ Pygame Visualization """
     pygame.init()
-    video = vidmaker.Video("rrt_shreejay_aaqib.mp4", late_export=True)
+    video = vidmaker.Video("rrt_"+iterations+".mp4", late_export=True)
     size = [600, 200]
     d = obstacle_buffer + robot_size
     monitor = pygame.display.set_mode(size)

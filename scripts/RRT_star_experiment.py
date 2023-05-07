@@ -53,7 +53,6 @@ def obstacles_rec(obstacle_buffer, robot_size):
     obstacles.append((0, c4_bound))
     return obstacles
 
-
 def obstacles_circ(obstacle_buffer, robot_size):
     a = 400
     b = 110
@@ -197,6 +196,7 @@ def update_neighbors(node):
                 if total_cost < existing_cost:
                     node_records[str(neighbor)] = new_node,total_cost
 
+# Not used in this algorithm
 def check_goal_reach(x,y,i):
     if find_distance(x, y, goal_pos[0], goal_pos[1]) < goal_radius:
         print('Explored Nodes length:', len(explored_nodes))
@@ -213,7 +213,7 @@ def check_last_iteration(iter):
     if iter == iterations - 1:
         print('Explored Nodes length:', len(explored_nodes))
         print('Node Records Length: ',len(node_records))
-        print('Completed all Iterations, now finding an optimal path.')
+        print('Completed all Iterations, now finding an optimal path - if exists....')
         goal_reg = find_goal_neighbors()
         optimal_cost = np.inf
         optimal_node = None
@@ -224,6 +224,8 @@ def check_last_iteration(iter):
         if optimal_node != None:
             print('Backtracking path:')
             print(backtracking(optimal_node))
+        else:
+            print('No optimal path exists.')
         end = time.time()
         print('Time: ', round((end - start), 2), 's')
         viz()
@@ -267,7 +269,7 @@ def arrow(screen, lcolor, tricolor, start, end, trirad):
 # Pygame Visualization
 def viz():
     pygame.init()
-    video = vidmaker.Video("rrt_star_experiment_shreejay_aaqib.mp4", late_export=True)
+    video = vidmaker.Video("rrt_star_experiment_"+str(iterations)+"_"+str(check_radius_RRTS)+".mp4", late_export=True)
     size = [600, 200]
     d = obstacle_buffer + robot_size
     monitor = pygame.display.set_mode(size)
@@ -317,6 +319,7 @@ def viz():
             arrow(monitor, "white", (0, 0, 0), [m[0], m[1]], [n[0], n[1]], 0.5)
             pygame.display.flip()
             clock.tick(10000)
+        
         for i in backtrack:
             pygame.draw.circle(monitor, (0, 255, 0), to_pygame(i, 200), 2)
             video.update(pygame.surfarray.pixels3d(monitor).swapaxes(0, 1), inverted=False)
@@ -328,7 +331,7 @@ def viz():
         Done = True
 
     pygame.quit()
-    video.export(verbose=True)
+    # video.export(verbose=True)
 
 robot_size = 10.5
 
@@ -336,10 +339,9 @@ map_x = 600
 map_y = 200
 
 init_pos = (int(500), int(100))
-goal_pos = (int(400), int(40))
-goal_radius = 5
+goal_pos = (int(100), int(180))
 
-iterations = 12000
+iterations = 100000
 
 node_records = {}
 explored_nodes = []
@@ -354,11 +356,12 @@ obstacles_var2 = obstacles_circ(obstacle_buffer,robot_size)
 print('RRT Starring....')
 
 if not check_obstacles(init_pos[0],init_pos[1]):
-    print('Start node in the obstacle space.')
+    print('Start node in the obstacle space. ABORT')
 if not check_obstacles(goal_pos[0],goal_pos[1]):
-    print('Goal node in the obstacle space.')
+    print('Goal node in the obstacle space. ABORT')
 
-check_radius_RRTS = 15
+check_radius_RRTS = 6
+goal_radius = 5
 
 if __name__ == '__main__':
     start = time.time()

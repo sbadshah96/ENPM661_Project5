@@ -53,7 +53,6 @@ def obstacles_rec(obstacle_buffer, robot_size):
     obstacles.append((0, c4_bound))
     return obstacles
 
-
 def obstacles_circ(obstacle_buffer, robot_size):
     a = 400
     b = 110
@@ -240,7 +239,7 @@ def arrow(screen, lcolor, tricolor, start, end, trirad):
 # Pygame Visualization
 def viz():
     pygame.init()
-    video = vidmaker.Video("rrt_star_shreejay_aaqib.mp4", late_export=True)
+    video = vidmaker.Video("rrt_star_"+str(iterations)+"_"+str(check_radius_RRTS)+".mp4", late_export=True)
     size = [600, 200]
     d = obstacle_buffer + robot_size
     monitor = pygame.display.set_mode(size)
@@ -301,15 +300,15 @@ def viz():
         Done = True
 
     pygame.quit()
-    video.export(verbose=True)
+    # video.export(verbose=True)
 
 robot_size = 10.5
 
 map_x = 600
 map_y = 200
 
-init_pos = (int(500), int(100))
-goal_pos = (int(100), int(40))
+init_pos = (int(15), int(30))
+goal_pos = (int(300), int(160))
 goal_radius = 5
 
 iterations = 30000
@@ -320,7 +319,7 @@ visited_nodes_track = OrderedSet()
 rand_points = []
 backtrack = []
 
-obstacle_buffer = 5
+obstacle_buffer = 3
 obstacles_var1 = obstacles_rec(obstacle_buffer,robot_size)
 obstacles_var2 = obstacles_circ(obstacle_buffer,robot_size)
 
@@ -331,7 +330,7 @@ if not check_obstacles(init_pos[0],init_pos[1]):
 if not check_obstacles(goal_pos[0],goal_pos[1]):
     print('Goal node in the obstacle space.')
 
-check_radius_RRTS = 15
+check_radius_RRTS = 8
 
 if __name__ == '__main__':
     start = time.time()
