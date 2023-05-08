@@ -306,11 +306,11 @@ map_x = 600
 map_y = 200
 
 init_pos = (int(15), int(30))
-goal_pos = (int(120), int(180))
-# goal_pos = (int(300), int(160))
+# goal_pos = (int(120), int(180))
+goal_pos = (int(300), int(160))
 goal_radius = 10
 
-iterations = 30000
+iterations = 100000
 
 node_records = {}
 explored_nodes = []
